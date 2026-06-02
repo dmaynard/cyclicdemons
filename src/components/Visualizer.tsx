@@ -244,10 +244,8 @@ export const Visualizer: React.FC = () => {
     const stepAutomaton = () => {
         if (visualizer && !isImageLoading.current) {
             const changed = visualizer.step();
-            const total = visualizer.get_width() * visualizer.get_height();
-            const virgin = visualizer.get_virgin_count();
             renderFrame();
-            if (changed === 0 || changed === total || virgin === 0) {
+            if (changed === 0 || visualizer.is_cycling()) {
                 triggerDone();
             }
         }
@@ -274,9 +272,7 @@ export const Visualizer: React.FC = () => {
             let done = false;
             for (let i = 0; i < stepsPerFrameRef.current; i++) {
                 const changed = visualizer.step();
-                const total = visualizer.get_width() * visualizer.get_height();
-                const virgin = visualizer.get_virgin_count();
-                if (changed === 0 || changed === total || virgin === 0) {
+                if (changed === 0 || visualizer.is_cycling()) {
                     done = true;
                     break;
                 }

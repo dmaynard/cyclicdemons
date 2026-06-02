@@ -20,6 +20,9 @@ static mut PIXELS_B: [u8; MAX_PIXELS] = [0; MAX_PIXELS];
 static mut INITIAL_PIXELS: [u8; MAX_PIXELS] = [0; MAX_PIXELS];
 static mut VIRGIN_PIXELS: [bool; MAX_PIXELS] = [true; MAX_PIXELS];
 static mut VIRGIN_COUNT: usize = 0;
+const HISTORY_SIZE: usize = 512;
+static mut CHANGED_HISTORY: [usize; HISTORY_SIZE] = [0; HISTORY_SIZE];
+static mut FRAME_COUNT: usize = 0;
 static mut ACTIVE_BUFFER_IS_A: bool = true;
 static mut RAW_IMAGE_BUFFER: [u8; MAX_PIXELS * 3] = [0; MAX_PIXELS * 3]; // RGB
 static mut UPLOAD_BUFFER: [u8; UPLOAD_SIZE] = [0; UPLOAD_SIZE];
@@ -134,6 +137,7 @@ impl CyclicDemons {
                 VIRGIN_PIXELS[i] = true;
             }
             VIRGIN_COUNT = pixel_count;
+            FRAME_COUNT = 0;
             ACTIVE_BUFFER_IS_A = true;
             
             self.render();
@@ -182,9 +186,13 @@ impl CyclicDemons {
                         }
                     } else {
                         write_buf[i] = current_color;
-                    }
+                                }
                 }
             }
+            
+            let current_idx = FRAME_COUNT % HISTORY_SIZE;
+            CHANGED_HISTORY[current_idx] = changed;
+            FRAME_COUNT += 1;
             
             ACTIVE_BUFFER_IS_A = !ACTIVE_BUFFER_IS_A;
             changed
@@ -200,6 +208,7 @@ impl CyclicDemons {
                 VIRGIN_PIXELS[i] = true;
             }
             VIRGIN_COUNT = pixel_count;
+            FRAME_COUNT = 0;
             ACTIVE_BUFFER_IS_A = true;
             self.render();
         }
@@ -207,6 +216,41 @@ impl CyclicDemons {
 
     pub fn get_virgin_count(&self) -> usize {
         unsafe { VIRGIN_COUNT }
+    }
+
+    pub fn is_cycling(&self) -> bool {
+        unsafe {
+            if FRAME_COUNT < 64 { return false; }
+            
+            let current_idx = (FRAME_COUNT - 1) % HISTORY_SIZE;
+            let current_val = CHANGED_HISTORY[current_idx];
+            
+            // Search back for potential period P
+            let max_lookback = 128.min(FRAME_COUNT - 1);
+            
+            for p in 1..=max_lookback {
+                let past_idx = (FRAME_COUNT - 1 - p) % HISTORY_SIZE;
+                if CHANGED_HISTORY[past_idx] == current_val {
+                    // Potential period found. Verify the last 3*P frames match
+                    let check_len = (3 * p).max(10);
+                    if FRAME_COUNT < check_len + p + 1 { continue; }
+                    
+                    let mut is_match = true;
+                    for k in 1..check_len {
+                        let check_curr = (FRAME_COUNT - 1 - k) % HISTORY_SIZE;
+                        let check_past = (FRAME_COUNT - 1 - p - k) % HISTORY_SIZE;
+                        if CHANGED_HISTORY[check_curr] != CHANGED_HISTORY[check_past] {
+                            is_match = false;
+                            break;
+                        }
+                    }
+                    if is_match {
+                        return true;
+                    }
+                }
+            }
+            false
+        }
     }
 
     pub fn render(&self) {
