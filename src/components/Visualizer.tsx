@@ -244,6 +244,7 @@ export const Visualizer: React.FC = () => {
     const stepAutomaton = () => {
         if (visualizer && !isImageLoading.current) {
             const changed = visualizer.step();
+            console.log("CHANGED:", changed);
             renderFrame();
             if (changed === 0 || visualizer.is_cycling()) {
                 triggerDone();
@@ -272,6 +273,7 @@ export const Visualizer: React.FC = () => {
             let done = false;
             for (let i = 0; i < stepsPerFrameRef.current; i++) {
                 const changed = visualizer.step();
+                console.log("CHANGED ANIM:", changed);
                 if (changed === 0 || visualizer.is_cycling()) {
                     done = true;
                     break;

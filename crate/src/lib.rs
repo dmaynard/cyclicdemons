@@ -20,7 +20,7 @@ static mut PIXELS_B: [u8; MAX_PIXELS] = [0; MAX_PIXELS];
 static mut INITIAL_PIXELS: [u8; MAX_PIXELS] = [0; MAX_PIXELS];
 static mut VIRGIN_PIXELS: [bool; MAX_PIXELS] = [true; MAX_PIXELS];
 static mut VIRGIN_COUNT: usize = 0;
-const HISTORY_SIZE: usize = 512;
+const HISTORY_SIZE: usize = 4096;
 static mut CHANGED_HISTORY: [usize; HISTORY_SIZE] = [0; HISTORY_SIZE];
 static mut FRAME_COUNT: usize = 0;
 static mut ACTIVE_BUFFER_IS_A: bool = true;
@@ -226,7 +226,7 @@ impl CyclicDemons {
             let current_val = CHANGED_HISTORY[current_idx];
             
             // Search back for potential period P
-            let max_lookback = 128.min(FRAME_COUNT - 1);
+            let max_lookback = 1000.min(FRAME_COUNT - 1);
             
             for p in 1..=max_lookback {
                 let past_idx = (FRAME_COUNT - 1 - p) % HISTORY_SIZE;
