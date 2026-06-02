@@ -1,0 +1,79 @@
+# Tasks
+
+- [/] Project Setup
+    - [x] Create project directory `rust-audio-visualizer` <!-- id: 0 -->
+    - [x] Initialize Vite + React + TypeScript project <!-- id: 1 -->
+    - [x] Initialize Rust crate (wasm-pack) <!-- id: 2 -->
+    - [x] Configure build (vite-plugin-wasm / wasm-pack) <!-- id: 3 -->
+- [x] Rust Core Implementation
+    - [x] Define shared memory structure for pixels <!-- id: 4 -->
+    - [x] Implement FFT / Power Spectrum analysis (Handled via input processing) <!-- id: 5 -->
+    - [x] Create initial `Visualizer.tsx` component
+    - [x] Create `lib.rs` for Rust logic
+    - [x] Set up WASM build pipeline
+    - [x] Integrate `audio_visualizer_core` with React
+    - [x] Implement Basic Audio Frequency Analysis
+    - [x] Implement Canvas Rendering Loop
+    - [x] Debug WASM Heap Corruption Steps:
+        - [x] Isolate Image Loading (Version 1-3)
+        - [x] Isolate Renderer (Version 4-8)
+        - [x] Isolate Allocator (Version 9-14)
+        - [x] **Implement Static Buffers (Version 15 - FIX)**
+    - [x] Restore "Color Pumping" Visualization Logic
+    - [x] Implement Color Reduction (Median Cut) <!-- id: 6 -->
+    - [x] Implement Image Indexing Logic <!-- id: 7 -->
+    - [x] Implement Palette Animation System <!-- id: 8 -->
+- [x] web UI Implementation
+    - [x] Create Audio Player Controls (Play, Pause, Progress) <!-- id: 9 -->
+    - [x] Implement File Upload (Audio & Image) <!-- id: 10 -->
+    - [x] Setup Canvas & Animation Loop <!-- id: 11 -->
+    - [x] Improve Button Contrast (Force White Text) <!-- id: 17 -->
+    - [x] Create UI for color/bin selection (4, 8, 16, 32, 64) <!-- id: 19 -->
+    - [x] Sync Palette size with Frequency Bins <!-- id: 20 -->
+    - [x] Store Raw Image Buffer in Rust for re-quantization <!-- id: 21 -->
+    - [x] Verify Audio Playback <!-- id: 15 -->
+    - [x] Verify Visualizer Performance & Correctness <!-- id: 16 -->
+- [x] Tune AGC parameters (attack/decay/gain) for better responsiveness
+- [x] Fix low color count/saturation issues (adjust mapping logic)
+- [x] Ensure all frequency bands are animating correctly
+- [x] Implement HSL Palette Animation
+    - [x] Create HSL <-> RGB conversion helpers
+    - [x] Store Palette in HSL format
+    - [x] Update `process_frequencies` to modulate L/S instead of RGB
+- [x] Fix: Reset colors on pause (Zero Energy) - Refinement: Use ORIGINAL_PALETTE for exact restoration
+    - [x] Add logging to verify silence detection
+    - [x] Investigate why image appears darker during playback
+    - [x] Tune HSL modulation to prevent washout (Headroom-aware)
+    - [x] Tune AGC Decay and Boost Factors to reduce sensitivity
+    - [x] Cleanup Debug Logging
+- [x] Cleanup Debug Logging
+- [x] Fix: Crash on second image load (unreachable)
+    - [x] Add trace logging to pinpoint panic location (Phase 2: Mapping/Render)
+    - [x] Simplify load_image signature (Remove Result) to rule out binding crash
+    - [x] Fix unsafe aliasing / recursive object use in Visualizer.tsx (Pause animation during load)
+    - [x] Increase Static Buffer Size (Potential Heap Corruption/Overflow?)
+    - [x] Binary Search Crash (Disable Mapping/Median Cut)
+    - [x] Implement Zero-Copy Upload (Manual Buffer) to fix Wasm Memory Crash
+    - [x] Fix: Color Count Buttons (Quantization Logic Restoration)
+- [x] Implement Microphone Support
+    - [x] Create Microphone Toggle Button
+    - [x] Implement `getUserData` for Audio Stream
+    - [x] Handle Audio Context Switching (File vs Mic)
+    - [x] Auto-pause file playback when Mic is active
+    - [x] Implement Microphone Device Selection (Fix for Continuity Camera issues)
+- [x] Add Test Audio Files
+    - [x] Generate 20Hz-20kHz Logarithmic Stereo Sweep (`public/sweep_stereo.wav`)
+- [x] Load Default Assets (Flammarion Image & Chopin Audio)
+- [x] Implement Equalizer Mode
+    - [x] Update `lib.rs`: Expose `get_spectrum_ptr` (BIN_PEAKS) and `get_palette_ptr` (Colors)
+    - [x] Update `Visualizer.tsx`: Add Toggle Button & 2nd Render Mode
+- [x] Documentation
+- [x] Documentation
+    - [x] Create and Maintain `blog.md` <!-- id: 17 -->
+- [ ] Deployment (Next Session)
+    - [ ] Push local branch `feature/hsl-palette-animation` to GitHub
+    - [ ] Create Pull Request
+    - [ ] Merge into `main`
+    - [ ] Configure Netlify Hosting for `main` branch
+- [ ] Deployment
+    - [ ] Configure Netlify or GitHub Pages <!-- id: 18 -->
