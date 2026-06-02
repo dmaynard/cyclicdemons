@@ -13,6 +13,7 @@ export const Visualizer: React.FC = () => {
     const [colorCount, setColorCount] = useState(24);
     const [sliderColorCount, setSliderColorCount] = useState(24);
     const [stepsPerFrame, setStepsPerFrame] = useState(1);
+    const [showDoneToast, setShowDoneToast] = useState(false);
 
     const animationFrameRef = useRef<number>(0);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -26,10 +27,40 @@ export const Visualizer: React.FC = () => {
     useEffect(() => {
         isPlayingRef.current = isPlaying;
         stepsPerFrameRef.current = stepsPerFrame;
-        if (isPlaying && !animationFrameRef.current) {
-            animate();
+        if (isPlaying) {
+            setShowDoneToast(false);
+            if (!animationFrameRef.current) {
+                animate();
+            }
         }
     }, [isPlaying, stepsPerFrame]);
+
+    const playDoneBeep = () => {
+        try {
+            const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, ctx.currentTime); // A5 note
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.5);
+        } catch (e) {
+            console.error("Audio beep failed", e);
+        }
+    };
+
+    const triggerDone = () => {
+        setIsPlaying(false);
+        setShowDoneToast(true);
+        playDoneBeep();
+        setTimeout(() => setShowDoneToast(false), 3000);
+    };
 
     useEffect(() => {
         const loadWasm = async () => {
@@ -217,7 +248,7 @@ export const Visualizer: React.FC = () => {
             const virgin = visualizer.get_virgin_count();
             renderFrame();
             if (changed === 0 || changed === total || virgin === 0) {
-                setIsPlaying(false);
+                triggerDone();
             }
         }
     };
@@ -227,6 +258,7 @@ export const Visualizer: React.FC = () => {
             visualizer.reset();
             renderFrame();
             setIsPlaying(false);
+            setShowDoneToast(false);
         }
     };
 
@@ -252,7 +284,7 @@ export const Visualizer: React.FC = () => {
             renderFrame();
             
             if (done) {
-                setIsPlaying(false);
+                triggerDone();
                 animationFrameRef.current = 0;
                 return;
             }
@@ -336,16 +368,45 @@ export const Visualizer: React.FC = () => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                <canvas 
-                    ref={canvasRef} 
-                    style={{ 
-                        maxWidth: '100%', 
-                        maxHeight: '75vh', 
-                        objectFit: 'contain', 
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-                        backgroundColor: '#111' 
-                    }} 
-                />
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                    <canvas 
+                        ref={canvasRef} 
+                        className="visualizer-canvas"
+                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={handleDrop}
+                        style={{ 
+                            opacity: isImageLoading.current ? 0.5 : 1,
+                            filter: isDragging ? 'brightness(1.2)' : 'none',
+                            transition: 'all 0.2s ease',
+                            cursor: 'pointer',
+                            border: '2px solid transparent',
+                            borderColor: isDragging ? '#3498db' : 'transparent',
+                            boxShadow: isDragging ? '0 0 20px rgba(52, 152, 219, 0.5)' : '0 4px 6px rgba(0,0,0,0.3)'
+                        }}
+                        title="Drag and drop an image here to load it"
+                    />
+                    {showDoneToast && (
+                        <div style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            background: 'rgba(46, 204, 113, 0.9)',
+                            color: 'white',
+                            padding: '15px 30px',
+                            borderRadius: '30px',
+                            fontSize: '1.2rem',
+                            fontWeight: 'bold',
+                            boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+                            pointerEvents: 'none',
+                            animation: 'fadeInOut 3s ease forwards',
+                            zIndex: 10
+                        }}>
+                            Simulation Complete
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
