@@ -23,6 +23,8 @@ static mut VIRGIN_COUNT: usize = 0;
 const HISTORY_SIZE: usize = 32768;
 static mut CHANGED_HISTORY: [usize; HISTORY_SIZE] = [0; HISTORY_SIZE];
 static mut FRAME_COUNT: usize = 0;
+static mut LAST_CHANGED: [usize; 256] = [0; 256];
+static mut N_SYNCED: usize = 0;
 static mut ACTIVE_BUFFER_IS_A: bool = true;
 static mut RAW_IMAGE_BUFFER: [u8; MAX_PIXELS * 3] = [0; MAX_PIXELS * 3]; // RGB
 static mut UPLOAD_BUFFER: [u8; UPLOAD_SIZE] = [0; UPLOAD_SIZE];
@@ -139,6 +141,10 @@ impl CyclicDemons {
             VIRGIN_COUNT = pixel_count;
             FRAME_COUNT = 0;
             ACTIVE_BUFFER_IS_A = true;
+            N_SYNCED = 0;
+            for i in 0..256 {
+                LAST_CHANGED[i] = 0;
+            }
             
             self.render();
         }
@@ -192,9 +198,24 @@ impl CyclicDemons {
             
             let current_idx = FRAME_COUNT % HISTORY_SIZE;
             CHANGED_HISTORY[current_idx] = changed;
+            
+            let period = num_colors as usize + 1;
+            let expected = LAST_CHANGED[FRAME_COUNT % period];
+            if changed == expected {
+                N_SYNCED += 1;
+            } else {
+                N_SYNCED = 0;
+                LAST_CHANGED[FRAME_COUNT % period] = changed;
+            }
+            
             FRAME_COUNT += 1;
             
             ACTIVE_BUFFER_IS_A = !ACTIVE_BUFFER_IS_A;
+            
+            if N_SYNCED > period {
+                return 0; // Signal halt
+            }
+            
             changed
         }
     }
@@ -210,12 +231,33 @@ impl CyclicDemons {
             VIRGIN_COUNT = pixel_count;
             FRAME_COUNT = 0;
             ACTIVE_BUFFER_IS_A = true;
+            N_SYNCED = 0;
+            for i in 0..256 {
+                LAST_CHANGED[i] = 0;
+            }
             self.render();
         }
     }
 
     pub fn get_virgin_count(&self) -> usize {
         unsafe { VIRGIN_COUNT }
+    }
+
+    pub fn get_nsynced(&self) -> usize {
+        unsafe { N_SYNCED }
+    }
+
+    pub fn get_recent_history(&self, n: usize) -> Vec<u32> {
+        unsafe {
+            let mut res = Vec::with_capacity(n);
+            let n_actual = n.min(FRAME_COUNT).min(HISTORY_SIZE);
+            if n_actual == 0 { return res; }
+            for i in 0..n_actual {
+                let idx = (FRAME_COUNT - n_actual + i) % HISTORY_SIZE;
+                res.push(CHANGED_HISTORY[idx] as u32);
+            }
+            res
+        }
     }
 
     pub fn get_cycle_period(&self) -> usize {

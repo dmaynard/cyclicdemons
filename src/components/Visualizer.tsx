@@ -249,7 +249,8 @@ export const Visualizer: React.FC = () => {
             const total = visualizer.get_width() * visualizer.get_height();
             const percent = total > 0 ? (changed / total) * 100 : 0;
             if (debugTextRef.current) {
-                debugTextRef.current.innerText = `${percent.toFixed(2)}% Changed`;
+                const nsynced = visualizer.get_nsynced();
+                debugTextRef.current.innerText = `${percent.toFixed(2)}% Changed (Synced: ${nsynced})`;
             }
             if (debugSliderRef.current) {
                 debugSliderRef.current.value = percent.toString();
@@ -289,7 +290,8 @@ export const Visualizer: React.FC = () => {
                 const total = visualizer.get_width() * visualizer.get_height();
                 const percent = total > 0 ? (changed / total) * 100 : 0;
                 if (debugTextRef.current) {
-                    debugTextRef.current.innerText = `${percent.toFixed(2)}% Changed`;
+                    const nsynced = visualizer.get_nsynced();
+                    debugTextRef.current.innerText = `${percent.toFixed(2)}% Changed (Synced: ${nsynced})`;
                 }
                 if (debugSliderRef.current) {
                     debugSliderRef.current.value = percent.toString();
@@ -357,7 +359,17 @@ export const Visualizer: React.FC = () => {
                 {!isPlaying ? (
                     <button className="control-btn" onClick={() => setIsPlaying(true)} title="Play">▶</button>
                 ) : (
-                    <button className="control-btn" onClick={() => setIsPlaying(false)} title="Pause">⏸</button>
+                    <button className="control-btn" onClick={() => {
+                        setIsPlaying(false);
+                        if (visualizer) {
+                            const history = visualizer.get_recent_history(256);
+                            const blob = new Blob([history.join('\n')], {type: 'text/plain'});
+                            const a = document.createElement('a');
+                            a.href = URL.createObjectURL(blob);
+                            a.download = 'nchanged_history.txt';
+                            a.click();
+                        }
+                    }} title="Pause">⏸</button>
                 )}
             </div>
 
@@ -448,7 +460,7 @@ export const Visualizer: React.FC = () => {
                     boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
                 }}
             >
-                <span ref={debugTextRef} style={{ fontWeight: 'bold', fontSize: '16px' }}>0.00% Changed</span>
+                <span ref={debugTextRef} style={{ fontWeight: 'bold', fontSize: '16px' }}>0.00% Changed (Synced: 0)</span>
                 <input 
                     type="range" 
                     ref={debugSliderRef}
