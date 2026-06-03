@@ -246,7 +246,11 @@ export const Visualizer: React.FC = () => {
             const changed = visualizer.step();
             console.log("CHANGED:", changed);
             renderFrame();
-            if (changed === 0 || visualizer.is_cycling()) {
+            const cyclePeriod = visualizer.get_cycle_period();
+            if (changed === 0 || cyclePeriod > 0) {
+                if (cyclePeriod > 0) {
+                    console.log(`HALTED! Cycle period detected: ${cyclePeriod} frames`);
+                }
                 triggerDone();
             }
         }
@@ -273,8 +277,11 @@ export const Visualizer: React.FC = () => {
             let done = false;
             for (let i = 0; i < stepsPerFrameRef.current; i++) {
                 const changed = visualizer.step();
-                console.log("CHANGED ANIM:", changed);
-                if (changed === 0 || visualizer.is_cycling()) {
+                const cyclePeriod = visualizer.get_cycle_period();
+                if (changed === 0 || cyclePeriod > 0) {
+                    if (cyclePeriod > 0) {
+                        console.log(`HALTED! Cycle period detected: ${cyclePeriod} frames`);
+                    }
                     done = true;
                     break;
                 }
