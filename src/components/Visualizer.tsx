@@ -244,12 +244,15 @@ export const Visualizer: React.FC = () => {
     const stepAutomaton = () => {
         if (visualizer && !isImageLoading.current) {
             const changed = visualizer.step();
+            const total = visualizer.get_width() * visualizer.get_height();
             console.log("CHANGED:", changed);
             renderFrame();
             const cyclePeriod = visualizer.get_cycle_period();
-            if (changed === 0 || cyclePeriod > 0) {
+            if (changed === 0 || changed === total || cyclePeriod > 0) {
                 if (cyclePeriod > 0) {
                     console.log(`HALTED! Cycle period detected: ${cyclePeriod} frames`);
+                } else if (changed === total) {
+                    console.log(`HALTED! Every pixel is changing simultaneously`);
                 }
                 triggerDone();
             }
@@ -277,10 +280,13 @@ export const Visualizer: React.FC = () => {
             let done = false;
             for (let i = 0; i < stepsPerFrameRef.current; i++) {
                 const changed = visualizer.step();
+                const total = visualizer.get_width() * visualizer.get_height();
                 const cyclePeriod = visualizer.get_cycle_period();
-                if (changed === 0 || cyclePeriod > 0) {
+                if (changed === 0 || changed === total || cyclePeriod > 0) {
                     if (cyclePeriod > 0) {
                         console.log(`HALTED! Cycle period detected: ${cyclePeriod} frames`);
+                    } else if (changed === total) {
+                        console.log(`HALTED! Every pixel is changing simultaneously`);
                     }
                     done = true;
                     break;
