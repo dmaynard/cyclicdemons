@@ -251,11 +251,8 @@ export const Visualizer: React.FC = () => {
             }
             console.log("CHANGED:", changed);
             renderFrame();
-            const cyclePeriod = visualizer.get_cycle_period();
-            if (changed === 0 || changed === total || cyclePeriod > 0) {
-                if (cyclePeriod > 0) {
-                    console.log(`HALTED! Cycle period detected: ${cyclePeriod} frames`);
-                } else if (changed === total) {
+            if (changed === 0 || changed === total) {
+                if (changed === total) {
                     console.log(`HALTED! Every pixel is changing simultaneously`);
                 }
                 triggerDone();
@@ -288,11 +285,8 @@ export const Visualizer: React.FC = () => {
                 if (debugInfoRef.current) {
                     debugInfoRef.current.innerText = `Changed: ${changed} / Total: ${total}`;
                 }
-                const cyclePeriod = visualizer.get_cycle_period();
-                if (changed === 0 || changed === total || cyclePeriod > 0) {
-                    if (cyclePeriod > 0) {
-                        console.log(`HALTED! Cycle period detected: ${cyclePeriod} frames`);
-                    } else if (changed === total) {
+                if (changed === 0 || changed === total) {
+                    if (changed === total) {
                         console.log(`HALTED! Every pixel is changing simultaneously`);
                     }
                     done = true;
