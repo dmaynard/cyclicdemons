@@ -359,17 +359,7 @@ export const Visualizer: React.FC = () => {
                 {!isPlaying ? (
                     <button className="control-btn" onClick={() => setIsPlaying(true)} title="Play">▶</button>
                 ) : (
-                    <button className="control-btn" onClick={() => {
-                        setIsPlaying(false);
-                        if (visualizer) {
-                            const history = visualizer.get_recent_history(256);
-                            const blob = new Blob([history.join('\n')], {type: 'text/plain'});
-                            const a = document.createElement('a');
-                            a.href = URL.createObjectURL(blob);
-                            a.download = 'nchanged_history.txt';
-                            a.click();
-                        }
-                    }} title="Pause">⏸</button>
+                    <button className="control-btn" onClick={() => setIsPlaying(false)} title="Pause">⏸</button>
                 )}
             </div>
 
