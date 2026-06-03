@@ -167,17 +167,17 @@ export const Visualizer: React.FC = () => {
         }
     };
 
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    const handleDragOver = (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
         setIsDragging(true);
     };
 
-    const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    const handleDragLeave = (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
         setIsDragging(false);
     };
 
-    const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    const handleDrop = async (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
         setIsDragging(false);
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
