@@ -17,6 +17,7 @@ export const Visualizer: React.FC = () => {
 
     const animationFrameRef = useRef<number>(0);
     const imageInputRef = useRef<HTMLInputElement>(null);
+    const debugInfoRef = useRef<HTMLDivElement>(null);
     const isPlayingRef = useRef(false);
     const stepsPerFrameRef = useRef(1);
     const isImageLoading = useRef(false);
@@ -245,6 +246,9 @@ export const Visualizer: React.FC = () => {
         if (visualizer && !isImageLoading.current) {
             const changed = visualizer.step();
             const total = visualizer.get_width() * visualizer.get_height();
+            if (debugInfoRef.current) {
+                debugInfoRef.current.innerText = `Changed: ${changed} / Total: ${total}`;
+            }
             console.log("CHANGED:", changed);
             renderFrame();
             const cyclePeriod = visualizer.get_cycle_period();
@@ -281,6 +285,9 @@ export const Visualizer: React.FC = () => {
             for (let i = 0; i < stepsPerFrameRef.current; i++) {
                 const changed = visualizer.step();
                 const total = visualizer.get_width() * visualizer.get_height();
+                if (debugInfoRef.current) {
+                    debugInfoRef.current.innerText = `Changed: ${changed} / Total: ${total}`;
+                }
                 const cyclePeriod = visualizer.get_cycle_period();
                 if (changed === 0 || changed === total || cyclePeriod > 0) {
                     if (cyclePeriod > 0) {
@@ -312,6 +319,24 @@ export const Visualizer: React.FC = () => {
             onDrop={handleDrop}
             style={{ position: 'relative' }}
         >
+            <div 
+                ref={debugInfoRef}
+                style={{
+                    position: 'absolute',
+                    top: '10px',
+                    left: '10px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    color: '#0f0',
+                    padding: '5px 10px',
+                    borderRadius: '4px',
+                    fontFamily: 'monospace',
+                    fontSize: '14px',
+                    zIndex: 50,
+                    pointerEvents: 'none'
+                }}
+            >
+                Changed: 0 / Total: 0
+            </div>
             {isConverting && (
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <h3 style={{ color: 'white' }}>Converting HEIC...</h3>
