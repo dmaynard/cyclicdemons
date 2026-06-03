@@ -322,43 +322,7 @@ export const Visualizer: React.FC = () => {
             onDrop={handleDrop}
             style={{ position: 'relative' }}
         >
-            <div 
-                style={{
-                    position: 'absolute',
-                    top: '10px',
-                    left: '10px',
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                    color: '#0f0',
-                    padding: '10px 15px',
-                    borderRadius: '8px',
-                    fontFamily: 'monospace',
-                    fontSize: '14px',
-                    zIndex: 50,
-                    pointerEvents: 'none',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '8px',
-                    width: '200px',
-                    boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
-                }}
-            >
-                <span ref={debugTextRef} style={{ fontWeight: 'bold', fontSize: '16px' }}>0.00% Changed</span>
-                <input 
-                    type="range" 
-                    ref={debugSliderRef}
-                    min="0" 
-                    max="100" 
-                    step="0.01"
-                    defaultValue="0"
-                    style={{ 
-                        width: '100%', 
-                        pointerEvents: 'none', 
-                        accentColor: '#0f0',
-                        cursor: 'default'
-                    }}
-                />
-            </div>
+
             {isConverting && (
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <h3 style={{ color: 'white' }}>Converting HEIC...</h3>
@@ -465,6 +429,40 @@ export const Visualizer: React.FC = () => {
                         </div>
                     )}
                 </div>
+            </div>
+
+            <div 
+                style={{
+                    margin: '20px auto 0',
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    color: '#0f0',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontFamily: 'monospace',
+                    fontSize: '14px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '8px',
+                    width: '300px',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+                }}
+            >
+                <span ref={debugTextRef} style={{ fontWeight: 'bold', fontSize: '16px' }}>0.00% Changed</span>
+                <input 
+                    type="range" 
+                    ref={debugSliderRef}
+                    min="0" 
+                    max="100" 
+                    step="0.01"
+                    defaultValue="0"
+                    style={{ 
+                        width: '100%', 
+                        pointerEvents: 'none', 
+                        accentColor: '#0f0',
+                        cursor: 'default'
+                    }}
+                />
             </div>
         </div>
     );
