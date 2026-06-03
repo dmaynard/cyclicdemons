@@ -17,7 +17,8 @@ export const Visualizer: React.FC = () => {
 
     const animationFrameRef = useRef<number>(0);
     const imageInputRef = useRef<HTMLInputElement>(null);
-    const debugInfoRef = useRef<HTMLDivElement>(null);
+    const debugTextRef = useRef<HTMLSpanElement>(null);
+    const debugSliderRef = useRef<HTMLInputElement>(null);
     const isPlayingRef = useRef(false);
     const stepsPerFrameRef = useRef(1);
     const isImageLoading = useRef(false);
@@ -246,8 +247,12 @@ export const Visualizer: React.FC = () => {
         if (visualizer && !isImageLoading.current) {
             const changed = visualizer.step();
             const total = visualizer.get_width() * visualizer.get_height();
-            if (debugInfoRef.current) {
-                debugInfoRef.current.innerText = `Changed: ${changed} / Total: ${total}`;
+            const percent = total > 0 ? (changed / total) * 100 : 0;
+            if (debugTextRef.current) {
+                debugTextRef.current.innerText = `${percent.toFixed(2)}% Changed`;
+            }
+            if (debugSliderRef.current) {
+                debugSliderRef.current.value = percent.toString();
             }
             console.log("CHANGED:", changed);
             renderFrame();
@@ -282,8 +287,12 @@ export const Visualizer: React.FC = () => {
             for (let i = 0; i < stepsPerFrameRef.current; i++) {
                 const changed = visualizer.step();
                 const total = visualizer.get_width() * visualizer.get_height();
-                if (debugInfoRef.current) {
-                    debugInfoRef.current.innerText = `Changed: ${changed} / Total: ${total}`;
+                const percent = total > 0 ? (changed / total) * 100 : 0;
+                if (debugTextRef.current) {
+                    debugTextRef.current.innerText = `${percent.toFixed(2)}% Changed`;
+                }
+                if (debugSliderRef.current) {
+                    debugSliderRef.current.value = percent.toString();
                 }
                 if (changed === 0 || changed === total) {
                     if (changed === total) {
@@ -314,22 +323,41 @@ export const Visualizer: React.FC = () => {
             style={{ position: 'relative' }}
         >
             <div 
-                ref={debugInfoRef}
                 style={{
                     position: 'absolute',
                     top: '10px',
                     left: '10px',
                     backgroundColor: 'rgba(0, 0, 0, 0.7)',
                     color: '#0f0',
-                    padding: '5px 10px',
-                    borderRadius: '4px',
+                    padding: '10px 15px',
+                    borderRadius: '8px',
                     fontFamily: 'monospace',
                     fontSize: '14px',
                     zIndex: 50,
-                    pointerEvents: 'none'
+                    pointerEvents: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '8px',
+                    width: '200px',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
                 }}
             >
-                Changed: 0 / Total: 0
+                <span ref={debugTextRef} style={{ fontWeight: 'bold', fontSize: '16px' }}>0.00% Changed</span>
+                <input 
+                    type="range" 
+                    ref={debugSliderRef}
+                    min="0" 
+                    max="100" 
+                    step="0.01"
+                    defaultValue="0"
+                    style={{ 
+                        width: '100%', 
+                        pointerEvents: 'none', 
+                        accentColor: '#0f0',
+                        cursor: 'default'
+                    }}
+                />
             </div>
             {isConverting && (
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
