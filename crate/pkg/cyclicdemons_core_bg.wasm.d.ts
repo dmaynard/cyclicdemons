@@ -10,6 +10,7 @@ export function cyclicdemons_step(a: number): number;
 export function cyclicdemons_reset(a: number): void;
 export function cyclicdemons_get_virgin_count(a: number): number;
 export function cyclicdemons_get_nsynced(a: number): number;
+export function cyclicdemons_get_frame_count(a: number): number;
 export function cyclicdemons_get_recent_history(a: number, b: number): Array;
 export function cyclicdemons_get_cycle_period(a: number): number;
 export function cyclicdemons_render(a: number): void;

@@ -247,6 +247,10 @@ impl CyclicDemons {
         unsafe { N_SYNCED }
     }
 
+    pub fn get_frame_count(&self) -> usize {
+        unsafe { FRAME_COUNT }
+    }
+
     pub fn get_recent_history(&self, n: usize) -> Vec<u32> {
         unsafe {
             let mut res = Vec::with_capacity(n);

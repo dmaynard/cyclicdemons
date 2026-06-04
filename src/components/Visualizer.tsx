@@ -9,9 +9,9 @@ export const Visualizer: React.FC = () => {
     const [visualizer, setVisualizer] = useState<CyclicDemons | null>(null);
     const [wasmMemory, setWasmMemory] = useState<WebAssembly.Memory | null>(null);
 
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [colorCount, setColorCount] = useState(24);
-    const [sliderColorCount, setSliderColorCount] = useState(24);
+    const [isPlaying, setIsPlaying] = useState(true);
+    const [colorCount, setColorCount] = useState(64);
+    const [sliderColorCount, setSliderColorCount] = useState(64);
     const [stepsPerFrame, setStepsPerFrame] = useState(1);
     const [showDoneToast, setShowDoneToast] = useState(false);
 
@@ -144,7 +144,7 @@ export const Visualizer: React.FC = () => {
     useEffect(() => {
         if (visualizer && wasmMemory && !hasLoadedDefaultRef.current) {
             hasLoadedDefaultRef.current = true;
-            processImage('/FlammarionColor.png');
+            processImage('/Monarch.png');
         }
     }, [visualizer, wasmMemory]);
 
@@ -261,6 +261,10 @@ export const Visualizer: React.FC = () => {
                 if (changed === total) {
                     console.log(`HALTED! Every pixel is changing simultaneously`);
                 }
+                const frames = visualizer.get_frame_count();
+                if (debugTextRef.current) {
+                    debugTextRef.current.innerText = `Halted at Frame ${frames}`;
+                }
                 triggerDone();
             }
         }
@@ -300,14 +304,18 @@ export const Visualizer: React.FC = () => {
                     if (changed === total) {
                         console.log(`HALTED! Every pixel is changing simultaneously`);
                     }
+                    const frames = visualizer.get_frame_count();
+                    if (debugTextRef.current) {
+                        debugTextRef.current.innerText = `Halted at Frame ${frames}`;
+                    }
                     done = true;
+                    triggerDone();
                     break;
                 }
             }
             renderFrame();
             
             if (done) {
-                triggerDone();
                 animationFrameRef.current = 0;
                 return;
             }
@@ -436,26 +444,26 @@ export const Visualizer: React.FC = () => {
             <div 
                 style={{
                     position: 'fixed',
-                    bottom: '20px',
+                    bottom: '15px',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
                     color: '#0f0',
-                    padding: '10px 20px',
-                    borderRadius: '8px',
+                    padding: '5px 15px',
+                    borderRadius: '6px',
                     fontFamily: 'monospace',
-                    fontSize: '14px',
+                    fontSize: '11px',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: '8px',
-                    width: '300px',
-                    boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+                    gap: '4px',
+                    width: '250px',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
                     zIndex: 1000,
-                    backdropFilter: 'blur(4px)'
+                    backdropFilter: 'blur(2px)'
                 }}
             >
-                <span ref={debugTextRef} style={{ fontWeight: 'bold', fontSize: '16px' }}>0.00% Changed (Synced: 0)</span>
+                <span ref={debugTextRef} style={{ fontWeight: 'bold', fontSize: '12px' }}>0.00% Changed (Synced: 0)</span>
                 <input 
                     type="range" 
                     ref={debugSliderRef}

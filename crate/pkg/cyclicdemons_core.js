@@ -165,6 +165,13 @@ export class CyclicDemons {
         return ret >>> 0;
     }
     /**
+     * @returns {number}
+     */
+    get_frame_count() {
+        const ret = wasm.cyclicdemons_get_frame_count(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
      * @param {number} n
      * @returns {Uint32Array}
      */

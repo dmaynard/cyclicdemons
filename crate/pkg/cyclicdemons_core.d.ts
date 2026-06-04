@@ -30,6 +30,10 @@ export class CyclicDemons {
    */
   get_nsynced(): number;
   /**
+   * @returns {number}
+   */
+  get_frame_count(): number;
+  /**
    * @param {number} n
    * @returns {Uint32Array}
    */
@@ -70,6 +74,7 @@ export interface InitOutput {
   readonly cyclicdemons_reset: (a: number) => void;
   readonly cyclicdemons_get_virgin_count: (a: number) => number;
   readonly cyclicdemons_get_nsynced: (a: number) => number;
+  readonly cyclicdemons_get_frame_count: (a: number) => number;
   readonly cyclicdemons_get_recent_history: (a: number, b: number) => Array;
   readonly cyclicdemons_get_cycle_period: (a: number) => number;
   readonly cyclicdemons_render: (a: number) => void;
