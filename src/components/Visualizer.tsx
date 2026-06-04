@@ -435,8 +435,11 @@ export const Visualizer: React.FC = () => {
 
             <div 
                 style={{
-                    margin: '20px auto 0',
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    position: 'fixed',
+                    bottom: '20px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
                     color: '#0f0',
                     padding: '10px 20px',
                     borderRadius: '8px',
@@ -447,7 +450,9 @@ export const Visualizer: React.FC = () => {
                     alignItems: 'center',
                     gap: '8px',
                     width: '300px',
-                    boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+                    zIndex: 1000,
+                    backdropFilter: 'blur(4px)'
                 }}
             >
                 <span ref={debugTextRef} style={{ fontWeight: 'bold', fontSize: '16px' }}>0.00% Changed (Synced: 0)</span>
