@@ -29,13 +29,13 @@ export const Visualizer: React.FC = () => {
     useEffect(() => {
         isPlayingRef.current = isPlaying;
         stepsPerFrameRef.current = stepsPerFrame;
-        if (isPlaying) {
+        if (isPlaying && visualizer) {
             setShowDoneToast(false);
             if (!animationFrameRef.current) {
                 animate();
             }
         }
-    }, [isPlaying, stepsPerFrame]);
+    }, [isPlaying, stepsPerFrame, visualizer]);
 
     const playDoneBeep = () => {
         try {
