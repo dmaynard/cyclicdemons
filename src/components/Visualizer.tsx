@@ -21,7 +21,7 @@ export const Visualizer: React.FC = () => {
     const debugSliderRef = useRef<HTMLInputElement>(null);
     const isPlayingRef = useRef(false);
     const stepsPerFrameRef = useRef(1);
-    const isImageLoading = useRef(false);
+    const isImageLoading = useRef(true);
     const hasLoadedDefaultRef = useRef(false);
     const [isDragging, setIsDragging] = useState(false);
     const [isConverting, setIsConverting] = useState(false);
@@ -92,6 +92,7 @@ export const Visualizer: React.FC = () => {
     }, [sliderColorCount, colorCount]);
 
     const processImage = (url: string) => {
+        isImageLoading.current = true;
         const img = new Image();
         img.onload = () => {
             const MAX_W = 1600;
@@ -137,6 +138,10 @@ export const Visualizer: React.FC = () => {
                 console.error("Error loading image:", err);
                 isImageLoading.current = false;
             }
+        };
+        img.onerror = () => {
+            console.error("Image failed to load");
+            isImageLoading.current = false;
         };
         img.src = url;
     };
