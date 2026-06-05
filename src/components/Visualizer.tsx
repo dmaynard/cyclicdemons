@@ -25,6 +25,7 @@ export const Visualizer: React.FC = () => {
     const hasLoadedDefaultRef = useRef(false);
     const [isDragging, setIsDragging] = useState(false);
     const [isConverting, setIsConverting] = useState(false);
+    const [isLoadingUI, setIsLoadingUI] = useState(true);
 
     useEffect(() => {
         isPlayingRef.current = isPlaying;
@@ -93,6 +94,7 @@ export const Visualizer: React.FC = () => {
 
     const processImage = (url: string) => {
         isImageLoading.current = true;
+        setIsLoadingUI(true);
         const img = new Image();
         img.onload = () => {
             const MAX_W = 1600;
@@ -134,14 +136,17 @@ export const Visualizer: React.FC = () => {
                 renderFrame();
 
                 isImageLoading.current = false;
+                setIsLoadingUI(false);
             } catch (err) {
                 console.error("Error loading image:", err);
                 isImageLoading.current = false;
+                setIsLoadingUI(false);
             }
         };
         img.onerror = () => {
             console.error("Image failed to load");
             isImageLoading.current = false;
+            setIsLoadingUI(false);
         };
         img.src = url;
     };
@@ -205,14 +210,17 @@ export const Visualizer: React.FC = () => {
         if (visualizer) {
             try {
                 isImageLoading.current = true;
+                setIsLoadingUI(true);
                 visualizer.set_color_count(count);
                 isImageLoading.current = false;
+                setIsLoadingUI(false);
                 if (visualizer.get_width() > 0) {
                     renderFrame();
                 }
             } catch (e) {
                 console.error("Error setting color count:", e);
                 isImageLoading.current = false;
+                setIsLoadingUI(false);
             }
         }
     };
@@ -413,7 +421,7 @@ export const Visualizer: React.FC = () => {
                         onDragLeave={() => setIsDragging(false)}
                         onDrop={handleDrop}
                         style={{ 
-                            opacity: isImageLoading.current ? 0.5 : 1,
+                            opacity: isLoadingUI ? 0.5 : 1,
                             filter: isDragging ? 'brightness(1.2)' : 'none',
                             transition: 'all 0.2s ease',
                             cursor: 'pointer',
