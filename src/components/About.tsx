@@ -35,6 +35,14 @@ export const About: React.FC<AboutProps> = ({ isOpen, onClose }) => {
 
                     <div style={{ marginTop: '25px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         <a 
+                            href="https://davidsmaynard.com/blog/cyclic-demons" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{ color: '#3498db', textDecoration: 'none', fontWeight: 'bold' }}
+                        >
+                            Read the Blog Post: Chasing Cyclic Demons
+                        </a>
+                        <a 
                             href="https://github.com/dmaynard/cyclicdemons" 
                             target="_blank" 
                             rel="noopener noreferrer"
