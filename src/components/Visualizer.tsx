@@ -14,6 +14,7 @@ export const Visualizer: React.FC = () => {
     const [sliderColorCount, setSliderColorCount] = useState(64);
     const [stepsPerFrame, setStepsPerFrame] = useState(1);
     const [showDoneToast, setShowDoneToast] = useState(false);
+    const [doneMessage, setDoneMessage] = useState("Simulation Complete");
 
     const animationFrameRef = useRef<number>(0);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -58,8 +59,9 @@ export const Visualizer: React.FC = () => {
         }
     };
 
-    const triggerDone = () => {
+    const triggerDone = (msg?: string) => {
         setIsPlaying(false);
+        setDoneMessage(msg || "Simulation Complete");
         setShowDoneToast(true);
         playDoneBeep();
         setTimeout(() => setShowDoneToast(false), 3000);
@@ -275,10 +277,28 @@ export const Visualizer: React.FC = () => {
                     console.log(`HALTED! Every pixel is changing simultaneously`);
                 }
                 const frames = visualizer.get_frame_count();
+                const period = visualizer.get_halted_period() || visualizer.get_cycle_period();
                 if (debugTextRef.current) {
-                    debugTextRef.current.innerText = `Halted at Frame ${frames}`;
+                    let reason = "";
+                    if (period > 1) {
+                        reason = ` (Oscillation - Period ${period})`;
+                    } else if (changed === 0) {
+                        reason = " (Equilibrium)";
+                    } else if (changed === total) {
+                        reason = ` (Oscillation - Period ${colorCount})`;
+                    }
+                    debugTextRef.current.innerText = `Halted at Frame ${frames}${reason}`;
                 }
-                triggerDone();
+                
+                let msg = "Simulation Complete";
+                if (period > 1) {
+                    msg = `Simulation Complete (Oscillation - Period ${period} Found)`;
+                } else if (changed === 0) {
+                    msg = "Simulation Complete (Equilibrium)";
+                } else if (changed === total) {
+                    msg = `Simulation Complete (Full-Image Oscillation - Period ${colorCount} Found)`;
+                }
+                triggerDone(msg);
             }
         }
     };
@@ -318,11 +338,29 @@ export const Visualizer: React.FC = () => {
                         console.log(`HALTED! Every pixel is changing simultaneously`);
                     }
                     const frames = visualizer.get_frame_count();
+                    const period = visualizer.get_halted_period() || visualizer.get_cycle_period();
                     if (debugTextRef.current) {
-                        debugTextRef.current.innerText = `Halted at Frame ${frames}`;
+                        let reason = "";
+                        if (period > 1) {
+                            reason = ` (Oscillation - Period ${period})`;
+                        } else if (changed === 0) {
+                            reason = " (Equilibrium)";
+                        } else if (changed === total) {
+                            reason = ` (Oscillation - Period ${colorCount})`;
+                        }
+                        debugTextRef.current.innerText = `Halted at Frame ${frames}${reason}`;
                     }
                     done = true;
-                    triggerDone();
+                    
+                    let msg = "Simulation Complete";
+                    if (period > 1) {
+                        msg = `Simulation Complete (Oscillation - Period ${period} Found)`;
+                    } else if (changed === 0) {
+                        msg = "Simulation Complete (Equilibrium)";
+                    } else if (changed === total) {
+                        msg = `Simulation Complete (Full-Image Oscillation - Period ${colorCount} Found)`;
+                    }
+                    triggerDone(msg);
                     break;
                 }
             }
@@ -448,7 +486,7 @@ export const Visualizer: React.FC = () => {
                             animation: 'fadeInOut 3s ease forwards',
                             zIndex: 10
                         }}>
-                            Simulation Complete
+                            {doneMessage}
                         </div>
                     )}
                 </div>

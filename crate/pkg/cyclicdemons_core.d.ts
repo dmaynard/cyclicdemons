@@ -24,11 +24,11 @@ export class CyclicDemons {
   /**
    * @returns {number}
    */
-  get_virgin_count(): number;
+  get_nsynced(): number;
   /**
    * @returns {number}
    */
-  get_nsynced(): number;
+  get_halted_period(): number;
   /**
    * @returns {number}
    */
@@ -72,8 +72,8 @@ export interface InitOutput {
   readonly cyclicdemons_set_color_count: (a: number, b: number) => void;
   readonly cyclicdemons_step: (a: number) => number;
   readonly cyclicdemons_reset: (a: number) => void;
-  readonly cyclicdemons_get_virgin_count: (a: number) => number;
   readonly cyclicdemons_get_nsynced: (a: number) => number;
+  readonly cyclicdemons_get_halted_period: (a: number) => number;
   readonly cyclicdemons_get_frame_count: (a: number) => number;
   readonly cyclicdemons_get_recent_history: (a: number, b: number) => Array;
   readonly cyclicdemons_get_cycle_period: (a: number) => number;

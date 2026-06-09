@@ -18,13 +18,12 @@ static mut DISPLAY_BUFFER: [u8; BUFFER_SIZE] = [0; BUFFER_SIZE];
 static mut PIXELS_A: [u8; MAX_PIXELS] = [0; MAX_PIXELS];
 static mut PIXELS_B: [u8; MAX_PIXELS] = [0; MAX_PIXELS];
 static mut INITIAL_PIXELS: [u8; MAX_PIXELS] = [0; MAX_PIXELS];
-static mut VIRGIN_PIXELS: [bool; MAX_PIXELS] = [true; MAX_PIXELS];
-static mut VIRGIN_COUNT: usize = 0;
 const HISTORY_SIZE: usize = 32768;
 static mut CHANGED_HISTORY: [usize; HISTORY_SIZE] = [0; HISTORY_SIZE];
 static mut FRAME_COUNT: usize = 0;
 static mut LAST_CHANGED: [usize; 256] = [0; 256];
 static mut N_SYNCED: usize = 0;
+static mut HALTED_PERIOD: usize = 0;
 static mut ACTIVE_BUFFER_IS_A: bool = true;
 static mut RAW_IMAGE_BUFFER: [u8; MAX_PIXELS * 3] = [0; MAX_PIXELS * 3]; // RGB
 static mut UPLOAD_BUFFER: [u8; UPLOAD_SIZE] = [0; UPLOAD_SIZE];
@@ -136,12 +135,11 @@ impl CyclicDemons {
                 PIXELS_A[i] = best_idx as u8;
                 PIXELS_B[i] = best_idx as u8;
                 INITIAL_PIXELS[i] = best_idx as u8;
-                VIRGIN_PIXELS[i] = true;
             }
-            VIRGIN_COUNT = pixel_count;
             FRAME_COUNT = 0;
             ACTIVE_BUFFER_IS_A = true;
             N_SYNCED = 0;
+            HALTED_PERIOD = 0;
             for i in 0..256 {
                 LAST_CHANGED[i] = 0;
             }
@@ -186,20 +184,18 @@ impl CyclicDemons {
                        read_buf[y * width + right] == eating_color {
                         write_buf[i] = eating_color;
                         changed += 1;
-                        if VIRGIN_PIXELS[i] {
-                            VIRGIN_PIXELS[i] = false;
-                            VIRGIN_COUNT -= 1;
-                        }
                     } else {
                         write_buf[i] = current_color;
-                                }
+                    }
                 }
             }
             
             let current_idx = FRAME_COUNT % HISTORY_SIZE;
             CHANGED_HISTORY[current_idx] = changed;
             
-            let period = num_colors as usize + 1;
+            let n_colors = num_colors as usize;
+            let period = if n_colors % 2 == 0 { n_colors } else { n_colors + 1 };
+
             let expected = LAST_CHANGED[FRAME_COUNT % period];
             if changed == expected {
                 N_SYNCED += 1;
@@ -213,6 +209,7 @@ impl CyclicDemons {
             ACTIVE_BUFFER_IS_A = !ACTIVE_BUFFER_IS_A;
             
             if N_SYNCED > period {
+                HALTED_PERIOD = period;
                 return 0; // Signal halt
             }
             
@@ -226,12 +223,11 @@ impl CyclicDemons {
             for i in 0..pixel_count {
                 PIXELS_A[i] = INITIAL_PIXELS[i];
                 PIXELS_B[i] = INITIAL_PIXELS[i];
-                VIRGIN_PIXELS[i] = true;
             }
-            VIRGIN_COUNT = pixel_count;
             FRAME_COUNT = 0;
             ACTIVE_BUFFER_IS_A = true;
             N_SYNCED = 0;
+            HALTED_PERIOD = 0;
             for i in 0..256 {
                 LAST_CHANGED[i] = 0;
             }
@@ -239,12 +235,14 @@ impl CyclicDemons {
         }
     }
 
-    pub fn get_virgin_count(&self) -> usize {
-        unsafe { VIRGIN_COUNT }
-    }
+
 
     pub fn get_nsynced(&self) -> usize {
         unsafe { N_SYNCED }
+    }
+
+    pub fn get_halted_period(&self) -> usize {
+        unsafe { HALTED_PERIOD }
     }
 
     pub fn get_frame_count(&self) -> usize {

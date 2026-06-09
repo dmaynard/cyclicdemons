@@ -153,15 +153,15 @@ export class CyclicDemons {
     /**
      * @returns {number}
      */
-    get_virgin_count() {
-        const ret = wasm.cyclicdemons_get_virgin_count(this.__wbg_ptr);
+    get_nsynced() {
+        const ret = wasm.cyclicdemons_get_nsynced(this.__wbg_ptr);
         return ret >>> 0;
     }
     /**
      * @returns {number}
      */
-    get_nsynced() {
-        const ret = wasm.cyclicdemons_get_nsynced(this.__wbg_ptr);
+    get_halted_period() {
+        const ret = wasm.cyclicdemons_get_halted_period(this.__wbg_ptr);
         return ret >>> 0;
     }
     /**
