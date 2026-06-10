@@ -225,7 +225,11 @@ impl CyclicDemons {
             CHANGED_HISTORY[current_idx] = changed;
             
             let n_colors = num_colors as usize;
-            let period = if n_colors % 2 == 0 { n_colors } else { n_colors + 1 };
+            let period = if USE_8_NEIGHBORS {
+                n_colors
+            } else {
+                if n_colors % 2 == 0 { n_colors } else { n_colors + 1 }
+            };
 
             let expected = LAST_CHANGED[FRAME_COUNT % period];
             if changed == expected {
