@@ -24,6 +24,7 @@ static mut FRAME_COUNT: usize = 0;
 static mut LAST_CHANGED: [usize; 256] = [0; 256];
 static mut N_SYNCED: usize = 0;
 static mut HALTED_PERIOD: usize = 0;
+static mut USE_8_NEIGHBORS: bool = false;
 static mut ACTIVE_BUFFER_IS_A: bool = true;
 static mut RAW_IMAGE_BUFFER: [u8; MAX_PIXELS * 3] = [0; MAX_PIXELS * 3]; // RGB
 static mut UPLOAD_BUFFER: [u8; UPLOAD_SIZE] = [0; UPLOAD_SIZE];
@@ -166,26 +167,56 @@ impl CyclicDemons {
             
             let mut changed = 0;
             
-            for y in 0..height {
-                for x in 0..width {
-                    let i = y * width + x;
-                    let current_color = read_buf[i];
-                    
-                    let eating_color = if current_color == 0 { num_colors - 1 } else { current_color - 1 };
-                    
-                    let left = if x == 0 { width - 1 } else { x - 1 };
-                    let right = if x == width - 1 { 0 } else { x + 1 };
-                    let up = if y == 0 { height - 1 } else { y - 1 };
-                    let down = if y == height - 1 { 0 } else { y + 1 };
-                    
-                    if read_buf[up * width + x] == eating_color ||
-                       read_buf[down * width + x] == eating_color ||
-                       read_buf[y * width + left] == eating_color ||
-                       read_buf[y * width + right] == eating_color {
-                        write_buf[i] = eating_color;
-                        changed += 1;
-                    } else {
-                        write_buf[i] = current_color;
+            if USE_8_NEIGHBORS {
+                for y in 0..height {
+                    for x in 0..width {
+                        let i = y * width + x;
+                        let current_color = read_buf[i];
+                        
+                        let eating_color = if current_color == 0 { num_colors - 1 } else { current_color - 1 };
+                        
+                        let left = if x == 0 { width - 1 } else { x - 1 };
+                        let right = if x == width - 1 { 0 } else { x + 1 };
+                        let up = if y == 0 { height - 1 } else { y - 1 };
+                        let down = if y == height - 1 { 0 } else { y + 1 };
+                        
+                        if read_buf[up * width + x] == eating_color ||
+                           read_buf[down * width + x] == eating_color ||
+                           read_buf[y * width + left] == eating_color ||
+                           read_buf[y * width + right] == eating_color ||
+                           read_buf[up * width + left] == eating_color ||
+                           read_buf[up * width + right] == eating_color ||
+                           read_buf[down * width + left] == eating_color ||
+                           read_buf[down * width + right] == eating_color {
+                            write_buf[i] = eating_color;
+                            changed += 1;
+                        } else {
+                            write_buf[i] = current_color;
+                        }
+                    }
+                }
+            } else {
+                for y in 0..height {
+                    for x in 0..width {
+                        let i = y * width + x;
+                        let current_color = read_buf[i];
+                        
+                        let eating_color = if current_color == 0 { num_colors - 1 } else { current_color - 1 };
+                        
+                        let left = if x == 0 { width - 1 } else { x - 1 };
+                        let right = if x == width - 1 { 0 } else { x + 1 };
+                        let up = if y == 0 { height - 1 } else { y - 1 };
+                        let down = if y == height - 1 { 0 } else { y + 1 };
+                        
+                        if read_buf[up * width + x] == eating_color ||
+                           read_buf[down * width + x] == eating_color ||
+                           read_buf[y * width + left] == eating_color ||
+                           read_buf[y * width + right] == eating_color {
+                            write_buf[i] = eating_color;
+                            changed += 1;
+                        } else {
+                            write_buf[i] = current_color;
+                        }
                     }
                 }
             }
@@ -243,6 +274,14 @@ impl CyclicDemons {
 
     pub fn get_halted_period(&self) -> usize {
         unsafe { HALTED_PERIOD }
+    }
+
+    pub fn set_use_8_neighbors(&self, use_8: bool) {
+        unsafe { USE_8_NEIGHBORS = use_8; }
+    }
+
+    pub fn get_use_8_neighbors(&self) -> bool {
+        unsafe { USE_8_NEIGHBORS }
     }
 
     pub fn get_frame_count(&self) -> usize {

@@ -15,6 +15,7 @@ export const Visualizer: React.FC = () => {
     const [stepsPerFrame, setStepsPerFrame] = useState(1);
     const [showDoneToast, setShowDoneToast] = useState(false);
     const [doneMessage, setDoneMessage] = useState("Simulation Complete");
+    const [use8Neighbors, setUse8Neighbors] = useState(false);
 
     const animationFrameRef = useRef<number>(0);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -38,6 +39,12 @@ export const Visualizer: React.FC = () => {
             }
         }
     }, [isPlaying, stepsPerFrame, visualizer]);
+
+    useEffect(() => {
+        if (visualizer) {
+            visualizer.set_use_8_neighbors(use8Neighbors);
+        }
+    }, [use8Neighbors, visualizer]);
 
     const playDoneBeep = () => {
         try {
@@ -448,6 +455,24 @@ export const Visualizer: React.FC = () => {
                     style={{ verticalAlign: 'middle' }}
                 />
                 <span>{stepsPerFrame}x</span>
+
+                <span style={{ borderLeft: '1px solid #444', height: '20px', display: 'inline-block', verticalAlign: 'middle', margin: '0 15px' }}></span>
+
+                <button 
+                    className="control-btn" 
+                    onClick={() => setUse8Neighbors(!use8Neighbors)}
+                    title="Toggle neighborhood model"
+                    style={{ 
+                        fontWeight: 'bold',
+                        backgroundColor: use8Neighbors ? '#3498db' : 'transparent',
+                        borderColor: use8Neighbors ? '#2980b9' : '#444',
+                        color: use8Neighbors ? '#fff' : '#ccc',
+                        padding: '4px 10px',
+                        fontSize: '12px'
+                    }}
+                >
+                    {use8Neighbors ? "8 Neighbors (Moore)" : "4 Neighbors (Von Neumann)"}
+                </button>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>

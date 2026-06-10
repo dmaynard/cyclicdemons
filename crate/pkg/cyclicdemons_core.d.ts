@@ -30,6 +30,14 @@ export class CyclicDemons {
    */
   get_halted_period(): number;
   /**
+   * @param {boolean} use_8
+   */
+  set_use_8_neighbors(use_8: boolean): void;
+  /**
+   * @returns {boolean}
+   */
+  get_use_8_neighbors(): boolean;
+  /**
    * @returns {number}
    */
   get_frame_count(): number;
@@ -74,6 +82,8 @@ export interface InitOutput {
   readonly cyclicdemons_reset: (a: number) => void;
   readonly cyclicdemons_get_nsynced: (a: number) => number;
   readonly cyclicdemons_get_halted_period: (a: number) => number;
+  readonly cyclicdemons_set_use_8_neighbors: (a: number, b: number) => void;
+  readonly cyclicdemons_get_use_8_neighbors: (a: number) => number;
   readonly cyclicdemons_get_frame_count: (a: number) => number;
   readonly cyclicdemons_get_recent_history: (a: number, b: number) => Array;
   readonly cyclicdemons_get_cycle_period: (a: number) => number;

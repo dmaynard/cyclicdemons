@@ -165,6 +165,19 @@ export class CyclicDemons {
         return ret >>> 0;
     }
     /**
+     * @param {boolean} use_8
+     */
+    set_use_8_neighbors(use_8) {
+        wasm.cyclicdemons_set_use_8_neighbors(this.__wbg_ptr, use_8);
+    }
+    /**
+     * @returns {boolean}
+     */
+    get_use_8_neighbors() {
+        const ret = wasm.cyclicdemons_get_use_8_neighbors(this.__wbg_ptr);
+        return ret !== 0;
+    }
+    /**
      * @returns {number}
      */
     get_frame_count() {
